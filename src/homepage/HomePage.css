@@ -1,0 +1,28 @@
+.home-container {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack children vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    height: 100vh; /* Take at least the full height of the viewport */
+    margin: 0; /* Reset default margin */
+    padding: 50px;
+  }
+  
+  .home-logo {
+    width: 100%; 
+    max-width: 900px; /* Adjust based on your requirement */
+    margin-bottom: 0px; /* Adjust if you need more space between logo and title */
+  }
+  
+  .home-title {
+    margin-bottom: 20px;
+    font-size: 3em; /* Larger title size */
+  }
+  
+  /* Add a hover effect for the button for better user interaction */
+  .home-button:hover {
+    background-color: #d3a9d9; /* Slightly lighter shade on hover */
+  }
+  
+  
+  
