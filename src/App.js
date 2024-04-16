@@ -4,7 +4,9 @@ import HomePage from './homepage/HomePage';
 import PanelistNumber from './panelistnumber/PanelistNumber';
 import Demographics from './demographics/Demographics';
 import Camera from './camera/Camera';
-import './App.css'; // If you have global styles
+import Sample from './sample/Sample';
+import Questions from './questions/Questions';
+import './App.css'; 
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
         <Route path="/panelist" element={<PanelistNumber />} />
         <Route path="/demographics" element={<Demographics />} />
         <Route path="/camera" element={<Camera />} />
+        <Route path="/sample" element={<Sample />} />
+        <Route path="/questions" element={<Questions />} />
       </Routes>
     </BrowserRouter>
   );

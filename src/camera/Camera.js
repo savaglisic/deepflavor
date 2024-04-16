@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import Webcam from 'react-webcam';
 import { Button, Box, Paper, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; 
 
 function Camera() {
   const [isCameraReady, setIsCameraReady] = useState(false);
+  const navigate = useNavigate();
 
   const videoConstraints = {
     width: 720,
@@ -13,6 +15,10 @@ function Camera() {
 
   const handleCameraStart = () => {
     setIsCameraReady(true);
+  };
+
+  const handleSubmit = () => {
+    navigate('/sample');
   };
 
   return (
@@ -35,14 +41,14 @@ function Camera() {
         </Typography>
         <Webcam
           audio={false}
-          height={720}
-          width={720}
+          height={videoConstraints.height / 1.3} // Reduce scale by 2
+          width={videoConstraints.width / 1.3} // Reduce scale by 2
           videoConstraints={videoConstraints}
           onUserMedia={handleCameraStart}
           screenshotFormat="image/jpeg"
           style={{ borderRadius: '10px', marginBottom: '20px' }}
         />
-        <Button variant="contained" size="large" disabled={!isCameraReady}>
+        <Button variant="contained" size="large" disabled={!isCameraReady} onClick={handleSubmit}>
           Continue
         </Button>
       </Box>
