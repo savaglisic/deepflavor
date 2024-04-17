@@ -27,7 +27,7 @@ function PanelistNumber() {
   }, []);
 
   const handleContinueClick = () => {
-    if (!panelistId || isNaN(panelistId) || Number(panelistId) >= 300 || Number(panelistId) <= 0) {
+    if (!panelistId || isNaN(panelistId) || Number(panelistId) > 300 || Number(panelistId) <= 0) {
       setOpenDialog(true);
     } else {
       localStorage.setItem('panelistId', panelistId);
@@ -38,6 +38,11 @@ function PanelistNumber() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     inputRef.current.focus();
+  };
+
+  const handleReset = () => {
+    localStorage.clear();
+    navigate("/");
   };
 
   return (
@@ -80,6 +85,9 @@ function PanelistNumber() {
         />
         <Button variant="contained" color="primary" onClick={handleContinueClick} sx={{ marginTop: 2, fontSize: '1.2rem' }}>
           Continue
+        </Button>
+        <Button variant="text" onClick={handleReset} sx={{ marginTop: 10, fontSize: '1.0rem', color: 'black' }}>
+          Wrong number in the box? Click here to reset
         </Button>
 
         {/* Dialog component for validation errors */}

@@ -66,8 +66,7 @@ function HomePage() {
             onClick={handleClearLocalStorage}
             sx={{
               position: 'absolute',
-              right: 20, // Distance from the right
-              bottom: 20, // Distance from the bottom
+              bottom: 40, // Distance from the bottom
               backgroundColor: '#ff6868', // Reddish tone for emphasis
               color: 'white', // White text
               '&:hover': {
