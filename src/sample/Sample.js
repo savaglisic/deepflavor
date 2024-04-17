@@ -10,18 +10,23 @@ function Sample() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch sample numbers from the database
-    readData('sensory_sample_nums', (data) => {
-      const samples = data ? data.split(',') : [];
-      setSampleNumbers(samples);
-    });
+    const requiredKeys = ["panelistId", "ethnicity", "age", "race", "blueberryConsumption", "selectedGender"];
+    const allItemsPresent = requiredKeys.every(key => localStorage.getItem(key) !== null);
 
-    // Check local storage for a selected sample number
-    const storedSelectedSample = localStorage.getItem('selectedSample');
-    if (storedSelectedSample) {
-      setSelectedSample(storedSelectedSample);
+    if (!allItemsPresent) {
+      localStorage.clear();
+      navigate('/panelist');
+    } else {
+      readData('sensory_sample_nums', (data) => {
+        const samples = data ? data.split(',') : [];
+        setSampleNumbers(samples);
+      });
+      const storedSelectedSample = localStorage.getItem('selectedSample');
+      if (storedSelectedSample) {
+        setSelectedSample(storedSelectedSample);
+      }
     }
-  }, []);
+  }, [navigate]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);

@@ -1,38 +1,84 @@
 import React from 'react';
-import Button from '@mui/material/Button';
+import { Button, Typography, Paper, Box, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import './HomePage.css'; // This will import the CSS for styling
 
 function HomePage() {
     const navigate = useNavigate();
 
     const handleGetStartedClick = () => {
         navigate('/panelist'); // Navigate to the PanelistNumber page
-  };
+    };
 
-  return (
-    <div className="home-container">
-      <img src="/assets/ailogo.png" alt="DeepFlavor and University of Florida Logos" className="home-logo" />
-      <h1 className="home-title">Blueberry Flavor Panel</h1>
-      <Button
-          variant="contained"
-          onClick={handleGetStartedClick}
+    const handleClearLocalStorage = () => {
+        localStorage.clear(); // Clears the local storage
+        console.log('Local storage cleared'); // Optional: for debugging
+    };
+
+    return (
+      <Paper 
+        elevation={3} 
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          padding: 4,
+          position: 'relative' // Position relative for absolute positioning of the icon and button
+        }}
+      >
+        <IconButton 
+          onClick={handleClearLocalStorage}
           sx={{
-            backgroundColor: '#618dde', // Example color
-            borderRadius: '20px',
-            padding: '20px 60px',
-            fontSize: '2em', // Larger font size for the text inside the button
-            textTransform: 'none',
-            '&:hover': {
-              backgroundColor: '#d3a9d9', // Slightly lighter shade on hover
-            },
-            // Add additional styling if necessary
+            position: 'absolute',
+            left: 20, // Distance from the left
+            bottom: 20, // Distance from the bottom
+            color: 'gray' // Icon color
           }}
         >
-          Get Started
-        </Button>
-    </div>
-  );
+        </IconButton>
+
+        <Box sx={{ textAlign: 'center', marginBottom: 4 }}>
+          <img src="/assets/ailogo.png" alt="DeepFlavor and University of Florida Logos" style={{ width: '100%', height: 'auto', marginBottom: '20px' }} />
+          <Typography variant="h4" gutterBottom sx={{ color: '#333', fontWeight: 'bold' }}>
+            Blueberry Flavor Panel
+          </Typography>
+        </Box>
+        <Button
+            variant="contained"
+            onClick={handleGetStartedClick}
+            sx={{
+              backgroundColor: '#618dde',
+              borderRadius: '20px',
+              padding: '10px 30px',
+              fontSize: '1.5rem',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: '#5071bf',
+              }
+            }}
+          >
+            Get Started
+          </Button>
+
+        <Button
+            variant="contained"
+            onClick={handleClearLocalStorage}
+            sx={{
+              position: 'absolute',
+              right: 20, // Distance from the right
+              bottom: 20, // Distance from the bottom
+              backgroundColor: '#ff6868', // Reddish tone for emphasis
+              color: 'white', // White text
+              '&:hover': {
+                backgroundColor: '#ff5a5a', // Slightly lighter red on hover
+              }
+            }}
+          >
+            Clear Cache
+          </Button>
+      </Paper>
+    );
 }
 
 export default HomePage;

@@ -4,30 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { writeData, readData } from '../database';  
 import { v4 as uuidv4 } from 'uuid';
 
-
 function Form() {
   const [samplesPerPanelist, setSamplesPerPanelist] = useState(0);
-  const [panelistProgress, setPanelistProgress] = useState(localStorage.getItem('panelistProgress'));
   const [sensoryQuestions, setSensoryQuestions] = useState([]);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     readData('samples_per_panelist', (data) => {
       if (data) {
         setSamplesPerPanelist(data);
-        if (!panelistProgress) {
-          localStorage.setItem('panelistProgress', '2');
-          setPanelistProgress('2');
-        }
       }
     });
-
-    readData('sensory_questions', (data) => {
-        if (data) {
-          setSensoryQuestions(data);
-        }
-      });
-  }, [panelistProgress]);
+    readData('sensory_questions', setSensoryQuestions);
+  }, []);
 
   const formatDate = () => {
     const date = new Date();
@@ -59,22 +48,19 @@ function Form() {
     writeData(dateKey, dataToUpload);
   };  
 
-  const handleContinue = () => {
-    if (parseInt(panelistProgress, 10) > samplesPerPanelist) {
-        uploadLocalStorageData();
-        localStorage.clear();
-        navigate('/');
-    } else {
-        uploadLocalStorageData();
-        sensoryQuestions.forEach(question => {
-            localStorage.removeItem(question.attributeTested);
-        });
-        localStorage.removeItem("selectedSample");
-        navigate('/sample');
-        const nextProgress = parseInt(panelistProgress, 10) + 1;
-        localStorage.setItem('panelistProgress', nextProgress.toString());
-        setPanelistProgress(nextProgress.toString());
-    }
+  const handleNextSample = () => {
+    uploadLocalStorageData();
+    navigate('/sample');
+    sensoryQuestions.forEach(question => {
+        localStorage.removeItem(question.attributeTested);
+    });
+    localStorage.removeItem("selectedSample");
+  };
+
+  const handleCompleteAll = () => {
+    uploadLocalStorageData();
+    localStorage.clear();
+    navigate('/');
   };
 
   return (
@@ -92,19 +78,28 @@ function Form() {
           Progress Check
         </Typography>
         <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: '20px' }}>
-          {parseInt(panelistProgress, 10) >= samplesPerPanelist ?
-            "You have reviewed all samples, please click the red button below to save and exit." :
-            `Please activate the red light to let the team know you're ready for sample ${panelistProgress} of ${samplesPerPanelist}.`
-          }
+          You have just completed the review of sample {localStorage.getItem('selectedSample')}. Today you are scheduled to review {samplesPerPanelist} samples in total.
+        </Typography>
+        <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: '20px' }}>
+          If you are ready for your next sample, turn on the red light in your booth to let the team know.
         </Typography>
         <Button
           variant="contained"
           color="primary"
           size="large"
-          onClick={handleContinue}
+          onClick={handleNextSample}
           sx={{ marginTop: 2 }}
         >
-          {parseInt(panelistProgress, 10) >= samplesPerPanelist ? "Save and Exit" : "Continue"}
+          Next Sample
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          size="large"
+          onClick={handleCompleteAll}
+          sx={{ marginTop: 11 }}
+        >
+          I've completed all {samplesPerPanelist} sample reviews
         </Button>
       </Box>
     </Paper>

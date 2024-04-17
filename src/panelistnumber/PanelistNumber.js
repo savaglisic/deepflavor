@@ -5,6 +5,7 @@ import {
   TextField, 
   Button, 
   Box, 
+  Paper, // Use Paper for consistent styling
   Dialog, 
   DialogTitle, 
   DialogContent, 
@@ -26,86 +27,81 @@ function PanelistNumber() {
   }, []);
 
   const handleContinueClick = () => {
-    // Check if the value is not empty, contains only numbers, and is less than 300
     if (!panelistId || isNaN(panelistId) || Number(panelistId) >= 300 || Number(panelistId) <= 0) {
-      setOpenDialog(true); // If the check fails, open the dialog
+      setOpenDialog(true);
     } else {
       localStorage.setItem('panelistId', panelistId);
-      console.log("Panelist ID is valid:", panelistId);
       navigate('/demographics');
     }
   };
 
   const handleCloseDialog = () => {
-    setOpenDialog(false); // Close the dialog
-    inputRef.current.focus(); // Focus back on the input field
+    setOpenDialog(false);
+    inputRef.current.focus();
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-      }}
-    >
-      <Typography variant="h4" component="h2" color="textPrimary" gutterBottom>
-        Panelist Information
-      </Typography>
-      <Typography 
-        variant="body1" 
-        component="p" 
-        color="error" 
-        gutterBottom 
-        sx={{ fontSize: '2.2rem', marginBottom: '20px' }}
-      >
-        Please enter your two or three digit PANELIST ID number.
-      </Typography>
-      <TextField
-        variant="outlined"
-        placeholder="Panelist ID"
-        margin="normal"
+    <Paper elevation={3} sx={{ margin: 'auto', padding: 4, maxWidth: '720px', marginTop: 8, minHeight: '100vh' }}>
+      <Box
         sx={{
-          width: '11%', // Adjust width as needed
-          '.MuiInputBase-input': {
-            height: '2.5rem', // Adjust height as needed
-            fontSize: '1.8rem', // Adjust font size as needed
-            padding: '10px',
-          },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
         }}
-        value={panelistId}
-        onChange={(e) => setPanelistId(e.target.value)}
-        inputRef={inputRef}
-      />
-      <Button variant="contained" color="primary" onClick={handleContinueClick}>
-        Continue
-      </Button>
-
-      {/* Dialog component for the popup message */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
       >
-        <DialogTitle>
-          Oops, that's not the number we're looking for.
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ margin: '20px' }}> {/* Added padding */}
-            Your panelist ID number is usually a number between 1 and 100. Please ask one of the lab employees if you're unsure of your pre-assigned number.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Try Again
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+        <Typography variant="h5" gutterBottom>
+          Panelist Information
+        </Typography>
+        <Typography 
+          variant="body1" 
+          component="p" 
+          color="error" 
+          gutterBottom 
+          sx={{ fontSize: '1.4rem', marginBottom: '20px', textAlign: 'center' }}
+        >
+          Please enter your two or three digit PANELIST ID number.
+        </Typography>
+        <TextField
+          variant="outlined"
+          placeholder="Panelist ID"
+          margin="normal"
+          sx={{
+            width: '250px', // Adjust width for better visual balance
+            '& .MuiInputBase-input': {
+              height: '2.5rem',
+              fontSize: '1.2rem',
+            },
+          }}
+          value={panelistId}
+          onChange={(e) => setPanelistId(e.target.value)}
+          inputRef={inputRef}
+        />
+        <Button variant="contained" color="primary" onClick={handleContinueClick} sx={{ marginTop: 2, fontSize: '1.2rem' }}>
+          Continue
+        </Button>
+
+        {/* Dialog component for validation errors */}
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+        >
+          <DialogTitle>{"Invalid Panelist ID"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              That's not the number we're looking for. Try again, or ask a team member for help.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary">
+              Try Again
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </Paper>
   );
 }
 
 export default PanelistNumber;
-
-
