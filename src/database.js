@@ -1,8 +1,19 @@
 import database from './firebase';
-import { ref, set, onValue, remove } from 'firebase/database';
+import { ref, onValue, remove, runTransaction } from 'firebase/database';
 
 export const writeData = (path, data) => {
-  set(ref(database, path), data);
+  const entryRef = ref(database, path);
+  runTransaction(entryRef, (currentData) => {
+    if (currentData === null) {
+      return data;
+    } else {
+      if (!Array.isArray(currentData)) {
+        currentData = [currentData]; // Make current data an array if it isn't already
+      }
+      currentData.push(data);
+      return currentData;
+    }
+  });
 };
 
 export const readData = (path, callback) => {

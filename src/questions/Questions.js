@@ -43,18 +43,16 @@ function Questions() {
   const handleContinue = () => {
     const currentQuestion = questions[currentQuestionIndex];
     const currentTimestamp = new Date().getTime() - stopwatchStartTime;
-
+  
     if (currentQuestion.selectedQuestionType === 'Non Question Panelist Instruction' || selectedAnswer) {
       if (selectedAnswer) {
         localStorage.setItem(currentQuestion.attributeTested, selectedAnswer);
         console.log(currentQuestion.attributeTested + " = " + localStorage.getItem(currentQuestion.attributeTested));
-
+  
         if (currentQuestion.videoCapture) {
-          writeData(`sensory_times_${formatDate()}`, {
-            [`${currentQuestion.attributeTested}_${localStorage.getItem('panelistId')}_${localStorage.getItem('selectedSample')}`]: {
-              interactionTimestamps: interactionTimestamps.join(', '),
-              timeSpent: currentTimestamp.toString(),
-            },
+          writeData(`sensory_times_${formatDate()}/${currentQuestion.attributeTested}_${localStorage.getItem('panelistId')}_${localStorage.getItem('selectedSample')}`, {
+            interactionTimestamps: interactionTimestamps.join(', '),
+            timeSpent: currentTimestamp.toString(),
           });
         }
       }
@@ -67,6 +65,7 @@ function Questions() {
       }
     }
   };
+  
 
   const handleAnswerSelected = (value) => {
     const currentTimestamp = new Date().getTime() - stopwatchStartTime;
