@@ -6,6 +6,7 @@ import MultipleChoiceQuestion from './MultipleChoiceQuestion';
 import SliderQuestion from './SliderQuestion';
 import LongFormTextResponse from './LongFormTextResponse';
 import PanelistInstruction from './PanelistInstruction';
+import { useNavigate } from 'react-router-dom';
 
 function Questions() {
   const [questions, setQuestions] = useState([]);
@@ -13,21 +14,35 @@ function Questions() {
   const panelistId = localStorage.getItem('panelistId');
   const selectedSample = localStorage.getItem('selectedSample');
   const [selectedAnswer, setSelectedAnswer] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    readData('sensory_questions', (data) => {
-      setQuestions(data);
-    });
-  }, []);
+    const panelistId = localStorage.getItem('panelistId');
+    const selectedSample = localStorage.getItem('selectedSample');
+    
+    if (!panelistId || !selectedSample) {
+      localStorage.clear();
+      navigate('/');
+    } else {
+      readData('sensory_questions', (data) => {
+        setQuestions(data);
+      });
+    }
+  }, [navigate]);
 
   const handleContinue = () => {
-    if (selectedAnswer) {
-      // When continuing, save the answer to local storage
-      const currentQuestion = questions[currentQuestionIndex];
-      localStorage.setItem(currentQuestion.attributeTested, selectedAnswer);
-      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-      setSelectedAnswer(''); // Reset the selected answer for the next question
-      console.log(currentQuestion.attributeTested + " = " + localStorage.getItem(currentQuestion.attributeTested));
+    const currentQuestion = questions[currentQuestionIndex];
+    if (currentQuestion.selectedQuestionType === 'Non Question Panelist Instruction' || selectedAnswer) {
+      if (selectedAnswer) {
+        localStorage.setItem(currentQuestion.attributeTested, selectedAnswer);
+        console.log(currentQuestion.attributeTested + " = " + localStorage.getItem(currentQuestion.attributeTested));
+      }
+      if (currentQuestionIndex >= questions.length - 1) {
+        navigate('/form');  
+      } else {
+        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+        setSelectedAnswer('');
+      }
     }
   };
 
@@ -40,19 +55,20 @@ function Questions() {
       case 'Rating 1-9 - Dislike to Like':
         return <RatingQuestion key={`rating-${currentQuestionIndex}`} data={questionData} onAnswerSelected={handleAnswerSelected} />;
       case 'Custom Multiple Choice':
-        return <MultipleChoiceQuestion data={questionData} />;
+        return <MultipleChoiceQuestion key={`multiple-choice-${currentQuestionIndex}`} data={questionData} onAnswerSelected={handleAnswerSelected} />;
       case 'Slider 0-100 - Low to High':
-        return <SliderQuestion data={questionData} />;
+        return <SliderQuestion key={`slider-${currentQuestionIndex}`} data={questionData} onAnswerSelected={handleAnswerSelected} />;
       case 'Long Form Text Response':
-        return <LongFormTextResponse data={questionData} />;
+        return <LongFormTextResponse key={`long-form-${currentQuestionIndex}`} data={questionData} onAnswerSelected={handleAnswerSelected} />;
       case 'Non Question Panelist Instruction':
-        return <PanelistInstruction data={questionData} />;
+        return <PanelistInstruction key={`instruction-${currentQuestionIndex}`} data={questionData} />;
       default:
         return <Typography variant="body1">Unknown Question Type</Typography>;
     }
   };
 
   const currentQuestion = questions[currentQuestionIndex];
+  const isPanelistInstruction = currentQuestion?.selectedQuestionType === 'Non Question Panelist Instruction';
 
   return (
     <Paper elevation={3} sx={{ margin: 'auto', padding: 4, maxWidth: '720px', marginTop: 8 }}>
@@ -72,17 +88,15 @@ function Questions() {
         </Typography>
 
         {currentQuestion && renderQuestion(currentQuestion)}
-          {currentQuestionIndex < questions.length - 1 && (
-            <Button 
-              variant="contained" 
-              size="large" 
-              onClick={handleContinue}
-              sx={{ marginTop: 2 }}
-              disabled={!selectedAnswer} // Disable the button if no answer is selected
-            >
-              Continue
-            </Button>
-          )}
+        <Button
+          variant="contained"
+          size="large"
+          onClick={handleContinue}
+          sx={{ marginTop: 2 }}
+          disabled={!selectedAnswer && !isPanelistInstruction}
+        >
+          {currentQuestionIndex < questions.length - 1 ? "Continue" : "Finish"}
+        </Button>
       </Box>
     </Paper>
   );

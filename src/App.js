@@ -6,6 +6,7 @@ import Demographics from './demographics/Demographics';
 import Camera from './camera/Camera';
 import Sample from './sample/Sample';
 import Questions from './questions/Questions';
+import Form from './form/Form';
 import './App.css'; 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/camera" element={<Camera />} />
         <Route path="/sample" element={<Sample />} />
         <Route path="/questions" element={<Questions />} />
+        <Route path="/form" element={<Form />} />
       </Routes>
     </BrowserRouter>
   );
