@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { readData } from '../database';
+import { readData, writeData } from '../database';
 import { Paper, Button, Box, Typography } from '@mui/material';
 import RatingQuestion from './RatingQuestion';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
@@ -15,11 +15,13 @@ function Questions() {
   const selectedSample = localStorage.getItem('selectedSample');
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const navigate = useNavigate();
+  const [stopwatchStartTime, setStopwatchStartTime] = useState(null);
+  const [interactionTimestamps, setInteractionTimestamps] = useState([]);
 
   useEffect(() => {
     const panelistId = localStorage.getItem('panelistId');
     const selectedSample = localStorage.getItem('selectedSample');
-    
+
     if (!panelistId || !selectedSample) {
       localStorage.clear();
       navigate('/');
@@ -30,24 +32,51 @@ function Questions() {
     }
   }, [navigate]);
 
+  const formatDate = () => {
+    const date = new Date();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${mm}${dd}${yyyy}`;
+  };
+
   const handleContinue = () => {
     const currentQuestion = questions[currentQuestionIndex];
+    const currentTimestamp = new Date().getTime() - stopwatchStartTime;
+
     if (currentQuestion.selectedQuestionType === 'Non Question Panelist Instruction' || selectedAnswer) {
       if (selectedAnswer) {
         localStorage.setItem(currentQuestion.attributeTested, selectedAnswer);
         console.log(currentQuestion.attributeTested + " = " + localStorage.getItem(currentQuestion.attributeTested));
+
+        if (currentQuestion.videoCapture) {
+          writeData(`sensory_times_${formatDate()}`, {
+            [`${currentQuestion.attributeTested}_${localStorage.getItem('panelistId')}_${localStorage.getItem('selectedSample')}`]: {
+              interactionTimestamps: interactionTimestamps.join(', '),
+              timeSpent: currentTimestamp.toString(),
+            },
+          });
+        }
       }
       if (currentQuestionIndex >= questions.length - 1) {
-        navigate('/form');  
+        navigate('/form');
       } else {
         setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
         setSelectedAnswer('');
+        startStopwatch();
       }
     }
   };
 
   const handleAnswerSelected = (value) => {
+    const currentTimestamp = new Date().getTime() - stopwatchStartTime;
+    setInteractionTimestamps([...interactionTimestamps, currentTimestamp.toString()]);
     setSelectedAnswer(value);
+  };
+
+  const startStopwatch = () => {
+    setStopwatchStartTime(new Date().getTime());
+    setInteractionTimestamps([]);
   };
 
   const renderQuestion = (questionData) => {
@@ -69,6 +98,12 @@ function Questions() {
 
   const currentQuestion = questions[currentQuestionIndex];
   const isPanelistInstruction = currentQuestion?.selectedQuestionType === 'Non Question Panelist Instruction';
+
+  useEffect(() => {
+    if (currentQuestionIndex === 0) {
+      startStopwatch();
+    }
+  }, [currentQuestionIndex]);
 
   return (
     <Paper elevation={3} sx={{ margin: 'auto', padding: 4, maxWidth: '720px', marginTop: 8 }}>
